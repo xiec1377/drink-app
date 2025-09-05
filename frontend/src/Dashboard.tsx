@@ -4,6 +4,7 @@ import axios from "axios";
 import DrinkCard from "./components/DrinkCard";
 
 type Cocktail = {
+  idDrink: string;
   strDrink: string;
   strDrinkThumb: string;
   strAlcoholic: string;
@@ -42,12 +43,33 @@ function Dashboard() {
 
   const searchCocktail = async () => {
     try {
-      const response = await axios.get(
-        `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${search}`
-      );
-      if (response.data.drinks) {
-        console.log("search results:", response.data.drinks);
-        setSearchList(response.data.drinks);
+      const [searchName, searchIngredient] = await Promise.all([
+        axios.get(
+          `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${search}`
+        ),
+        axios.get(
+          `https:www.thecocktaildb.com/api/json/v1/1/filter.php?i=${search}`
+        ),
+      ]);
+
+      const searchNameResults = searchName.data.drinks || [];
+      const searchIngredientResults = searchIngredient.data.drinks || [];
+
+      console.log("searchanme:", searchNameResults);
+      console.log("searchingredient:", searchIngredientResults);
+
+      // merge results of both searches, removing duplicates
+      const mergeCocktails = () => {
+        const map = new Map();
+        [...searchNameResults, ...searchIngredientResults].forEach((drink) => {
+          map.set(drink.idDrink, drink);
+        });
+        return Array.from(map.values());
+      };
+
+      if (mergeCocktails().length > 0) {
+        console.log("search results:", mergeCocktails);
+        setSearchList(mergeCocktails);
       } else {
         console.log("No cocktails found for:", search);
       }
@@ -91,6 +113,7 @@ function Dashboard() {
       {searchList &&
         searchList.map((cocktail) => (
           <DrinkCard
+            key={cocktail.idDrink}
             name={cocktail?.strDrink ?? ""}
             image={`${cocktail?.strDrinkThumb}/small`}
             alcoholic={cocktail?.strAlcoholic ?? ""}
