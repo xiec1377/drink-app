@@ -18,6 +18,13 @@ function Searchbar() {
     // fetchAPI();
     // getRandom();
     fetchFilters();
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOpenIndex(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
   
     
@@ -111,7 +118,7 @@ function Searchbar() {
             Search
           </button>
         </div>
-          <div className="flex space-x-4" ref={containerRef}>
+      <div className="flex justify-between" ref={containerRef}>
       {dropdowns.map((dropdown, index) => (
         <div key={index} className="relative inline-block text-left">
           <button
@@ -131,12 +138,12 @@ function Searchbar() {
           </button>
 
           {openIndex === index && (
-            <div className="absolute left-0 w-48 mt-1 origin-top-right divide-y divide-gray-100 rounded-md shadow-lg ring-1 z-10">
+            <div className="absolute left-0 w-48 mt-1 origin-top-right divide-y divide-gray-100 rounded-none shadow-lg ring-1 z-10">
               <div>
                 {dropdown.items.map((item, idx) => (
                   <button
                     key={idx}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-300 "
+                    className="w-full px-4 py-2 text-left text-sm text-gray-300 rounded-none"
                   >
                     {item}
                   </button>
@@ -149,6 +156,7 @@ function Searchbar() {
     </div>
         
       </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       {searchList &&
         searchList.map((cocktail) => (
           <DrinkCard
@@ -158,7 +166,7 @@ function Searchbar() {
             alcoholic={cocktail?.strAlcoholic ?? ""}
             //   tags={cocktailFields?.strTags ?? ""}
           />
-        ))}{" "}</>
+        ))}</div></>
   );
 }
 

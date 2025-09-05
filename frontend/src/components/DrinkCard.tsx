@@ -15,7 +15,7 @@ function DrinkCard({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col">
+    <div className="">
       <img src={image} />
       <p>{name}</p>
       <p>{alcoholic}</p>
